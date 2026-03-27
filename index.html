@@ -264,7 +264,20 @@ function sanitize(str){
 
 function extractDateOnly(dateStr){
   if(!dateStr) return '날짜없음';
-  // 공백 기준 첫 덩어리만 (시간 제거)
+  const days = ['일','월','화','수','목','금','토'];
+  const m = dateStr.match(/(\d+)월\s*(\d+)일\s*(\([^)]+\))?/);
+  if(m){
+    const mon  = parseInt(m[1]);
+    const day  = parseInt(m[2]);
+    let   dow  = m[3] ? m[3] : null;
+    if(!dow){
+      // 요일 없으면 자동 계산 (현재 연도 기준)
+      const year = new Date().getFullYear();
+      const d = new Date(year, mon-1, day);
+      dow = '(' + days[d.getDay()] + ')';
+    }
+    return mon + '월' + day + '일' + dow;
+  }
   return dateStr.split(/\s+/)[0];
 }
 
