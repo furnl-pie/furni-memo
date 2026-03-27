@@ -455,17 +455,21 @@ async function saveFile(){
   if(!rootHandle){ showStatus('저장 폴더를 먼저 선택해주세요.','error'); return; }
   if(!company||!date){ showStatus('업체명과 일자는 필수입니다.','error'); return; }
 
-  const aptName       = extractApartmentName(address);
-  const dateOnly      = extractDateOnly(date);
-  const dateFolder    = sanitize(dateOnly);
-  const companyFolder = sanitize(company);
-  const fileName      = sanitize(aptName) + '.txt';
-  const content       = buildContent();
+  const aptName      = extractApartmentName(address);
+  const dateOnly     = extractDateOnly(date);
+  const dateFolder   = sanitize(dateOnly);
+  const companyBase  = sanitize(company);
+  const aptSanitized = sanitize(aptName);
+  const fileName     = aptSanitized + '.txt';
+  const content      = buildContent();
 
   const saveBtn = document.getElementById('saveBtn');
   try{
     saveBtn.disabled=true; saveBtn.textContent='저장 중...';
-    const dateDir    = await getOrCreateDir(rootHandle, dateFolder);
+    const dateDir = await getOrCreateDir(rootHandle, dateFolder);
+
+    const companyFolder = companyBase + '_' + aptSanitized;
+
     const companyDir = await getOrCreateDir(dateDir, companyFolder);
     const fileHandle = await companyDir.getFileHandle(fileName,{create:true});
     const writable   = await fileHandle.createWritable();
